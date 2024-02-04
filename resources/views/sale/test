@@ -1,0 +1,332 @@
+@extends('components.base_portal')
+
+@section('css')
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="{{ asset('assets/css/maintenance.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/css/dropify.min.css"
+        integrity="sha512-EZSUkJWTjzDlspOoPSpUFR0o0Xy7jdzW//6qhUkoZ9c4StFkVsp9fbbd0O06p9ELS3H486m4wmrCELjza4JEog=="
+        crossorigin="anonymous" referrerpolicy="no-referrer">
+@endsection
+
+@section('content')
+    <div class="content-maintenance">
+
+        <div class="mt-5">
+
+            <div class="title">
+                <p><i class="text-red">Management User Management</i></p>
+                <h3>Maintenance / User Management</h3>
+                <p>From this page, you can manage the features that have been provided.</p>
+
+            </div>
+
+            @if (in_array('Users Create', Session::get('menu')))
+                <div class="d-flex justify-content-end text-decoration-none mt-5">
+                    <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addModal">
+                        <i class="bi bi-plus-lg"></i>
+                        Add
+                    </button>
+                </div>
+
+                <div class="wrapperTable table-responsive">
+                    <table id="manageUserTable" class="tables" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                @if (in_array('Users Edit', Session::get('menu')) || in_array('Users Delete', Session::get('menu')))
+                                    <th>Action</th>
+                                @endif
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($result['data']['data'] as $key => $data)
+                                <tr>
+                                    <td>{{ $key + 1 }}</td>
+                                    <td>{{ $data['username'] }}</td>
+                                    <td>{{ $data['email'] }}</td>
+                                    <td>{{ $data['role']['role_name'] }}</td>
+                                    <td>
+                                        @if ($data['status'] == 1)
+                                            <i class="status-active">Active</i>
+                                        @else
+                                            <i class="status-danger">Inactive</i>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="d-flex">
+                                            @if (in_array('Users Edit', Session::get('menu')))
+                                                <button class="btn-primary me-1" data-bs-toggle="modal"
+                                                    data-bs-target="#editModal"
+                                                    data-url="{{ route('user.update', ['id' => $data['id']]) }}"
+                                                    data-id="{{ $data['id'] }}" data-username="{{ $data['username'] }}"
+                                                    data-email="{{ $data['email'] }}"
+                                                    data-role_id="{{ $data['role']['id'] }}"
+                                                    data-role_name="{{ $data['role']['role_name'] }}"
+                                                    data-status="{{ $data['status'] }}"><i
+                                                        class="bi bi-pencil-square"></i></button>
+                                            @endif
+
+                                            @if (in_array('Users Delete', Session::get('menu')))
+                                                <form action="{{ route('user.delete', ['id' => $data['id']]) }}"
+                                                    method="POST">
+                                                    @csrf
+                                                    <button class="btn-delete" type="submit"
+                                                        onclick="return confirm('Are you sure you want to delete this data?');"><i
+                                                            class="bi bi-trash-fill"></i></button>
+
+                                                </form>
+                                            @endif
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <div class="wrapperTable table-responsive mt">
+                    <table id="manageUserTable" class="tables" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                @if (in_array('Users Edit', Session::get('menu')) || in_array('Users Delete', Session::get('menu')))
+                                    <th>Action</th>
+                                @endif
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($result['data']['data'] as $key => $data)
+                                <tr>
+                                    <td>{{ $key + 1 }}</td>
+                                    <td>{{ $data['username'] }}</td>
+                                    <td>{{ $data['email'] }}</td>
+                                    <td>{{ $data['role']['role_name'] }}</td>
+                                    <td>
+                                        @if ($data['status'] == 1)
+                                            <i class="status-active">Active</i>
+                                        @else
+                                            <i class="status-danger">Inactive</i>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="d-flex">
+                                            @if (in_array('Users Edit', Session::get('menu')))
+                                                <button class="btn-primary me-1" data-bs-toggle="modal"
+                                                    data-bs-target="#editModal"
+                                                    data-url="{{ route('user.update', ['id' => $data['id']]) }}"
+                                                    data-id="{{ $data['id'] }}" data-username="{{ $data['username'] }}"
+                                                    data-email="{{ $data['email'] }}"
+                                                    data-role_id="{{ $data['role']['id'] }}"
+                                                    data-role_name="{{ $data['role']['role_name'] }}"
+                                                    data-status="{{ $data['status'] }}"><i
+                                                        class="bi bi-pencil-square"></i></button>
+                                            @endif
+
+                                            @if (in_array('Users Delete', Session::get('menu')))
+                                                <form action="{{ route('user.delete', ['id' => $data['id']]) }}"
+                                                    method="POST">
+                                                    @csrf
+                                                    <button class="btn-delete" type="submit"
+                                                        onclick="return confirm('Are you sure you want to delete this data?');"><i
+                                                            class="bi bi-trash-fill"></i></button>
+
+                                                </form>
+                                            @endif
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+
+        </div>
+
+        <!-- Modal Add -->
+        <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addModalLabel">Add User</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <form id="create-form" method="post" action="{{ route('user.create') }}">
+                            @csrf
+                            <div class="mb-3">
+                                <label for="Username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" aria-describedby="Username"
+                                    placeholder="..." name="username" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" aria-describedby="email"
+                                    placeholder="..." name="email" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" aria-describedby="password"
+                                    placeholder="..." name="password" required>
+                                <p class="text-danger mt-1" style="font-size: 14px">(Min 6 Character)</p>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="role" class="form-label">Role</label>
+                                <select class="form-select" aria-label="Default select example" id="role_id"
+                                    name="role_id" required>
+                                    <option selected>...</option>
+                                    @foreach ($role as $data)
+                                        <option value="{{ $data['id'] }}">{{ $data['role_name'] }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select required" aria-label="Default select example" id="status"
+                                    name="status" required>
+                                    <option selected>...</option>
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                            </div>
+
+                            <div class="d-flex justify-content-end mb-3">
+                                <button class="btn-add" type="submit" value="Validate!">
+                                    Add
+                                </button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Modal Add -->
+
+
+        <!-- Modal Edit -->
+        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content" id="modal-content">
+
+                    {{-- content here --}}
+
+                </div>
+            </div>
+        </div>
+        <!-- End Modal Edit -->
+
+
+    </div>
+@endsection
+
+@section('js')
+    {{-- Validate --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"
+        integrity="sha512-rstIgDs0xPgmG6RX1Aba4KV5cWJbAMcvRCVmglpam9SoHZiUCyQVDdH2LPlxoHtrv17XWblE/V/PP+Tr04hbtA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+
+    {{-- Dropify --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.min.js"
+        integrity="sha512-8QFTrG0oeOiyWo/VM9Y8kgxdlCryqhIxVeRpWSezdRRAvarxVtwLnGroJgnVW9/XBRduxO/z1GblzPrMQoeuew=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        $('.dropify').dropify();
+
+        $(document).ready(function() {
+            $('#manageUserTable').DataTable({
+                "info": false,
+                "bSort": false,
+            });
+        });
+    </script>
+
+    <script>
+        $('#editModal').on('shown.bs.modal', function(e) {
+            var getRole = @json($role);
+            var role = '';
+            getRole.forEach(function(data) {
+                console.log(data);
+                if (data.id == $(e.relatedTarget).data('role_id')) {
+                    role += '<option value="' + data.id + '" selected >' + data.role_name + '</option>';
+                } else {
+                    role += '<option value="' + data.id + '">' + data.role_name + '</option>';
+                }
+            });
+            var html = `
+            <div class="modal-content" id="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Edit User</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="edit">
+
+                        <form id="edit-form" method="post" action="${$(e.relatedTarget).data('url')}">
+                            @method('patch')
+                            @csrf
+                            <div class="mb-3">
+                                <label for="Username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" aria-describedby="Username"
+                                    placeholder="..." name="username" value="${$(e.relatedTarget).data('username')}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" aria-describedby="email"
+                                    placeholder="..." name="email" value="${$(e.relatedTarget).data('email')}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="role" class="form-label">Role</label>
+                                <select class="form-select" aria-label="Default select example" id="role_id"
+                                    name="role_id">
+                                    ${role}
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select required" aria-label="Default select example" id="status"
+                                    name="status">
+                                    <option selected value="${$(e.relatedTarget).data('status')}" >
+                                        ${$(e.relatedTarget).data('status') == 1 ? 'Active' : 'Inactive'}
+                                    </option>
+                                    ${$(e.relatedTarget).data('status') == 1 ? '<option value="0">Inactive</option>' : '<option value="1">Active</option>'}
+                                </select>
+                            </div>
+
+                            <div class="d-flex justify-content-end mb-3">
+                                <button class="btn-add" type="submit" value="Validate!">
+                                    Save
+                                </button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+                `;
+
+            $('#modal-content').html(html);
+            $('.dropify').dropify();
+
+        });
+    </script>
+@endsection
