@@ -13,7 +13,8 @@ class Sale extends Model
     protected $table = 'sales';
     protected $fillable =  [
         'buyer_id',
-        // 'product_id',
+        'product_id',
+        'quantity',
         'total_price',
     ];
 
@@ -27,8 +28,8 @@ class Sale extends Model
         return $this->hasMany(DetailSale::class, 'sale_id');
     }
 
-    // public function product()
-    // {
-    //     return $this->belongsTo(Product::class, 'product_id');
-    // }
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
+    }
 }

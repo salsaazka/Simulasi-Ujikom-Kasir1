@@ -26,7 +26,7 @@ Route::get('/dashboard', function () {
 })->name('dashboard');
 
 Route::middleware('isGuest')->group(function(){
-   
+
     Route::get('/sign-in', [AuthController::class, 'signIn'])->name('signIn');
     Route::post('/sign-in', [AuthController::class, 'auth'])->name('auth');
     Route::get('/sign-up', [AuthController::class, 'signUp'])->name('signUp');
@@ -62,7 +62,7 @@ Route::middleware('isLogin')->prefix('/sale')->name('sale.')->group(function () 
     Route::get('/edit/{id}', [SaleController::class, 'edit'])->name('edit');
     Route::patch('/update/{id}', [SaleController::class, 'update'])->name('update');
     Route::delete('/delete/{id}', [SaleController::class, 'destroy'])->name('destroy');
-   
+
     Route::get('/details/{id}', [SaleController::class, 'showModal'])->name('showModal');
 });
 
