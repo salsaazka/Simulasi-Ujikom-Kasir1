@@ -52,30 +52,7 @@ class SaleController extends Controller
         $combined_ids = implode(', ', $productsId);
         $quantity = $request->quantity;
         $quantity_array = explode(',', $quantity);
-        // $request->validate([
-        //     'product_id' => 'required',
-        //     'total_produk' => 'required|integer|min:1',
-        // ]);
 
-        // $productIds = $request->product_id;
-        // $products = Product::findMany($productIds);
-
-        // $totalPrice = 0;
-
-        // foreach ($products as $product) {
-        //     $quantity = $request->quantities[$product->id] ?? 0;
-        //     $newStock = $product->stok - $quantity;
-
-        //     if ($newStock < 0) {
-        //         return redirect()->back()->with('error', 'Stok produk ' . $product->name . ' tidak mencukupi');
-        //     }
-
-        //     $product->stok = $newStock;
-        //     $product->save();
-
-        //     $productTotalPrice = $product->price * $quantity;
-        //     $totalPrice += $productTotalPrice;
-        // }
 
         Sale::create([
             'buyer_id' => $request->buyer_id,
@@ -130,8 +107,9 @@ class SaleController extends Controller
     {
         $dataBuyer = Buyer::all();
         $dataProduct = Product::all();
-        $dataSale = DetailSale::with(['sales', 'products'])->find($id);
+        // $dataSale = DetailSale::with(['sales', 'products'])->find($id);
         // echo json_encode($dataSale);exit();
+        $dataSale = Sale::where('id', $id)->first();
         return view('sale.edit', compact(['dataBuyer', 'dataProduct', 'dataSale']));
     }
 
@@ -140,44 +118,75 @@ class SaleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'product_id' => 'required',
-            'buyer_id' => 'required',
-            'total_produk' => 'required'
-        ]);
+        // $request->validate([
+        //     'product_id' => 'required',
+        //     'buyer_id' => 'required',
+        //     'total_produk' => 'required'
+        // ]);
 
-        $product = Product::find($request->product_id);
+        // $product = Product::find($request->product_id);
 
-        if (!$product) {
-            return redirect()->back()->with('error', 'Produk tidak ditemukan');
-        }
+        // if (!$product) {
+        //     return redirect()->back()->with('error', 'Produk tidak ditemukan');
+        // }
 
-        $newStok = $product->stok - $request->total_produk;
+        // $newStok = $product->stok - $request->total_produk;
 
-        if ($newStok < 0) {
-            return redirect()->back()->with('error', 'Stok produk tidak mencukupi');
-        }
+        // if ($newStok < 0) {
+        //     return redirect()->back()->with('error', 'Stok produk tidak mencukupi');
+        // }
 
-        $product->update(['stok' => $newStok]);
+        // $product->update(['stok' => $newStok]);
 
+        // $sale = Sale::find($id);
+        // $sale->update([
+        //     'buyer_id' => $request->buyer_id,
+        // ]);
+
+        // // Hitung total harga dari subtotal semua item penjualan
+        // $totalPrice = DetailSale::where('sale_id', $id)->sum('subtotal');
+
+        // // Update kolom total_price pada model Sale
+        // $sale->update(['total_price' => $totalPrice]);
+
+        // $detailSale = DetailSale::where('sale_id', $id)->first();
+        // $detailSale->update([
+        //     'product_id' => $request->product_id,
+        //     'total_produk' => $request->total_produk,
+        //     'subtotal' => $product->price * $request->total_produk,
+        // ]);
         $sale = Sale::find($id);
-        $sale->update([
-            'buyer_id' => $request->buyer_id,
-        ]);
 
-        // Hitung total harga dari subtotal semua item penjualan
-        $totalPrice = DetailSale::where('sale_id', $id)->sum('subtotal');
-
-        // Update kolom total_price pada model Sale
-        $sale->update(['total_price' => $totalPrice]);
-
-        $detailSale = DetailSale::where('sale_id', $id)->first();
-        $detailSale->update([
-            'product_id' => $request->product_id,
-            'total_produk' => $request->total_produk,
-            'subtotal' => $product->price * $request->total_produk,
-        ]);
-
+        if (!$sale) {
+            return response()->json(['message' => 'Sale not found'], 404);
+        }
+    
+        $productsId = $request->product_id;
+        $combined_ids = implode(', ', $productsId);
+        $quantity = $request->quantity;
+        $quantity_array = explode(',', $quantity);
+    
+        $sale->buyer_id = $request->buyer_id;
+        $sale->product_id = $combined_ids;
+        $sale->quantity = $request->quantity;
+        $sale->total_price = $request->total_price;
+        $sale->save();
+    
+        // Restore the previous stock before the update
+        foreach ($productsId as $key => $product_id) {
+            $product = Product::find($product_id);
+            $quantity_to_add = $quantity_array[$key];
+            $product->stok = $product->stok + $quantity_to_add;
+            $product->save();
+        }
+    
+        // Subtract the new stock values
+        foreach ($productsId as $key => $product_id) {
+            $product = Product::find($product_id);
+            $quantity_to_subtract = $quantity_array[$key];
+            $product->stok = $product->stok - $quantity_to_subtract;
+            $product->save();
+        }
         return redirect()->route('sale.index')->with('success', 'Anda berhasil mengubah data');
     }
 

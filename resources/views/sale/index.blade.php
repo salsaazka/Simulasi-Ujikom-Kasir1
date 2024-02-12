@@ -54,33 +54,6 @@
                                                     <i class="fa-solid fa-eye"></i>
                                                 </button>
 
-                                                {{-- <div class="modal fade" id="myModal{{ $sale->id }}">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content">
-
-                                                            <div class="modal-header">
-                                                                <h4 class="modal-title">Detail Sale</h4>
-                                                                <button type="button" class="close"
-                                                                    data-dismiss="modal">&times;</button>
-                                                            </div>
-
-                                                            <div class="modal-body">
-                                                                <p><strong>Total Produk:</strong>
-                                                                    {{ $filteredDetails->total_produk }}</p>
-                                                                <p><strong>Subtotal:</strong> {{ $filteredDetails->subtotal }}</p>
-                                                                <p><strong>Product Name:</strong>
-                                                                    {{ $filteredDetails->name }}</p>
-                                                                <p><strong>Sale Date:</strong> {{ $filteredDetails->created_at }}
-                                                                </p>
-                                                            </div>
-
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-danger"
-                                                                    data-dismiss="modal">Close</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div> --}}
                                             </td>
                                         </tr>
                                     @endforeach
@@ -120,11 +93,10 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body" id="edit">
-
                         <div class="mb-3">
-                            <label for="Username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" aria-describedby="Username"
-                                placeholder="..." name="username" value="${$(e.relatedTarget).data('total_price')}">
+                            <label for="total_price" class="form-label">Subtotal</label>
+                            <input type="text" class="form-control" id="total_price" aria-describedby="Subtotal"
+                                placeholder="..." name="Subtotal" value="${$(e.relatedTarget).data('total_price')}">
                         </div>
 
                     </div>
