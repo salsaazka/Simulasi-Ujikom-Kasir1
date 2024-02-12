@@ -27,8 +27,8 @@ Route::get('/dashboard', function () {
 
 Route::middleware('isGuest')->group(function(){
    
-    Route::get('/sign-in', [AuthController::class, 'signIn'])->name('signIn');
-    Route::post('/sign-in', [AuthController::class, 'auth'])->name('auth');
+    Route::get('/', [AuthController::class, 'signIn'])->name('signIn');
+    Route::post('/', [AuthController::class, 'auth'])->name('auth');
     Route::get('/sign-up', [AuthController::class, 'signUp'])->name('signUp');
     Route::post('/sign-up', [AuthController::class, 'register'])->name('register');
 });

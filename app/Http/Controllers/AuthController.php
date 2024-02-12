@@ -50,12 +50,12 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
-        return redirect('/sign-in')->with('success', 'Selamat anda berhasil registrasi');
+        return redirect('/')->with('success', 'Selamat anda berhasil registrasi');
     }
 
     public function logout()
     {
         Auth::logout();
-        return redirect('/sign-in');
+        return redirect('/');
     }
 }

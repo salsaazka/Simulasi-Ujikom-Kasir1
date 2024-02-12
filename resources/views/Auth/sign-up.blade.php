@@ -64,7 +64,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link me-2" href="/sign-in">
+            <a class="nav-link me-2" href="/">
               <i class="fas fa-key opacity-6  me-1"></i>
               Sign In
             </a>
