@@ -9,6 +9,7 @@ use App\Models\DetailSale;
 use App\Models\Product;
 
 use DB;
+
 class SaleController extends Controller
 {
     /**
@@ -16,28 +17,28 @@ class SaleController extends Controller
      */
     public function index()
     {
-        
+
         $dataSale = Sale::with('buyer', 'details')->get();
-        $dataProduct = Product::all(); 
+        $dataProduct = Product::all();
         $detailSales = DetailSale::with(['products', 'sales'])->get();
         // dd($dataSale);
         // dd($details);
-        
+
         return view('sale.index', compact('dataSale', 'dataProduct', 'detailSales'));
     }
     public function showModal($id)
     {
         $details = DetailSale::with('products', 'sales')
-                     ->where('sale_id', $id)
-                     ->first();
-    
+            ->where('sale_id', $id)
+            ->first();
+
         return view('sale.index', compact('details'));
     }
 
     public function create()
-    { 
+    {
         $dataBuyer = Buyer::all();
-        $dataProduct = Product::all(); 
+        $dataProduct = Product::all();
         return view('sale.create', compact('dataBuyer', 'dataProduct'));
     }
 
@@ -47,38 +48,68 @@ class SaleController extends Controller
     public function store(Request $request)
     {
         // dd($request->all());
-        $request->validate([
-            'product_id' => 'required',
-            'total_produk' => 'required|integer|min:1',
-        ]);
+        $productsId =  $request->product_id;
+        $combined_ids = implode(', ', $productsId);
+        $quantity = $request->quantity;
+        $quantity_array = explode(',', $quantity);
+        // $request->validate([
+        //     'product_id' => 'required',
+        //     'total_produk' => 'required|integer|min:1',
+        // ]);
 
-        $product = Product::find($request->product_id);
+        // $productIds = $request->product_id;
+        // $products = Product::findMany($productIds);
 
-        if (!$product) {
-            return redirect()->back()->with('error', 'Produk tidak ditemukan');
-        }
+        // $totalPrice = 0;
 
-        $newStok = $product->stok - $request->total_produk;
+        // foreach ($products as $product) {
+        //     $quantity = $request->quantities[$product->id] ?? 0;
+        //     $newStock = $product->stok - $quantity;
 
-        if ($newStok < 0) {
-            return redirect()->back()->with('error', 'Stok produk ' . $product->name . ' tidak mencukupi');
-        }
+        //     if ($newStock < 0) {
+        //         return redirect()->back()->with('error', 'Stok produk ' . $product->name . ' tidak mencukupi');
+        //     }
 
-        $product->update(['stok' => $newStok]);
+        //     $product->stok = $newStock;
+        //     $product->save();
 
-        // Create a new sale record
-        $sale = Sale::create([
+        //     $productTotalPrice = $product->price * $quantity;
+        //     $totalPrice += $productTotalPrice;
+        // }
+
+        Sale::create([
             'buyer_id' => $request->buyer_id,
-            'total_price' => $product->price * $request->total_produk,
+            'product_id' => $combined_ids,
+            'quantity' => $request->quantity,
+            'total_price' => $request->total_price,
         ]);
 
-        // Create a new detail sale record
-        $detail = DetailSale::create([
-            'sale_id' => $sale->id,
-            'product_id' => $request->product_id,
-            'total_produk' => $request->total_produk,
-            'subtotal' => $product->price * $request->total_produk,
-        ]);
+        foreach ($productsId as $key => $product_id) {
+            $product = Product::find($product_id);
+            $quantity_to_subtract = $quantity_array[$key];
+            $product->stok = $product->stok - $quantity_to_subtract;
+            $product->save();
+        }
+
+
+        // if (!$product) {
+        //     return redirect()->back()->with('error', 'Produk tidak ditemukan');
+        // }
+
+        // $newStok = $product->stok - $request->total_produk;
+
+        // if ($newStok < 0) {
+        //     return redirect()->back()->with('error', 'Stok produk ' . $product->name . ' tidak mencukupi');
+        // }
+
+        // $product->update(['stok' => $newStok]);
+
+        // $detail = DetailSale::create([
+        //     'sale_id' => $sale->id,
+        //     'product_id' => $request->product_id,
+        //     'total_produk' => $request->total_produk,
+        //     'subtotal' => $product->price * $request->total_produk,
+        // ]);
 
         return redirect()->route('sale.index')->with('success', 'Anda berhasil menambah data');
     }
@@ -98,7 +129,7 @@ class SaleController extends Controller
     public function edit($id)
     {
         $dataBuyer = Buyer::all();
-        $dataProduct = Product::all(); 
+        $dataProduct = Product::all();
         $dataSale = DetailSale::with(['sales', 'products'])->find($id);
         // echo json_encode($dataSale);exit();
         return view('sale.edit', compact(['dataBuyer', 'dataProduct', 'dataSale']));
@@ -114,39 +145,39 @@ class SaleController extends Controller
             'buyer_id' => 'required',
             'total_produk' => 'required'
         ]);
-    
+
         $product = Product::find($request->product_id);
-    
+
         if (!$product) {
             return redirect()->back()->with('error', 'Produk tidak ditemukan');
         }
-    
+
         $newStok = $product->stok - $request->total_produk;
-    
+
         if ($newStok < 0) {
             return redirect()->back()->with('error', 'Stok produk tidak mencukupi');
         }
-    
+
         $product->update(['stok' => $newStok]);
-    
+
         $sale = Sale::find($id);
         $sale->update([
             'buyer_id' => $request->buyer_id,
         ]);
-    
+
         // Hitung total harga dari subtotal semua item penjualan
         $totalPrice = DetailSale::where('sale_id', $id)->sum('subtotal');
-    
+
         // Update kolom total_price pada model Sale
         $sale->update(['total_price' => $totalPrice]);
-    
+
         $detailSale = DetailSale::where('sale_id', $id)->first();
         $detailSale->update([
             'product_id' => $request->product_id,
             'total_produk' => $request->total_produk,
             'subtotal' => $product->price * $request->total_produk,
         ]);
-       
+
         return redirect()->route('sale.index')->with('success', 'Anda berhasil mengubah data');
     }
 
@@ -155,7 +186,7 @@ class SaleController extends Controller
      */
     public function destroy($id)
     {
-        $dataSale= Sale::where('id', $id)->delete();
+        $dataSale = Sale::where('id', $id)->delete();
         return redirect()->route('sale.index');
     }
 }

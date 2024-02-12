@@ -62,7 +62,7 @@ Route::middleware('isLogin')->prefix('/sale')->name('sale.')->group(function () 
     Route::get('/edit/{id}', [SaleController::class, 'edit'])->name('edit');
     Route::patch('/update/{id}', [SaleController::class, 'update'])->name('update');
     Route::delete('/delete/{id}', [SaleController::class, 'destroy'])->name('destroy');
-   
+
     Route::get('/details/{id}', [SaleController::class, 'showModal'])->name('showModal');
 });
 

@@ -7,18 +7,28 @@
                 <div class="card mb-4">
                     <div class="card-header pb-0 d-flex align-items-center justify-content-between">
                         <h6>Data table</h6>
-                        <a href="{{ route('sale.create') }}" class="btn add-new btn-success m-1 float-end"><i class="fa-solid fa-plus"></i></a>
+                        <a href="{{ route('sale.create') }}" class="btn add-new btn-success m-1 float-end"><i
+                                class="fa-solid fa-plus"></i></a>
                     </div>
                     <div class="card-body px-0 pt-0 pb-2">
                         <div class="table-responsive p-0">
                             <table class="table align-items-center mb-0">
                                 <thead>
                                     <tr>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Name Buyer</th>
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total Price</th>
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total Produk</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No
+                                        </th>
+                                        <th
+                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                            Name Buyer</th>
+                                        <th
+                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            Date</th>
+                                        <th
+                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            Total Price</th>
+                                        <th
+                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            Total Produk</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -31,21 +41,20 @@
                                             <td>{{ $sale->total_price }}</td>
                                             {{-- <td>{{ $sale->product->total_produk }}</td> --}}
                                             <td class="d-flex">
-                                                <a href="{{ route('sale.edit', $sale->id) }}" class="btn btn-warning" style="margin-right: 5px"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                <a href="{{ route('sale.edit', $sale->id) }}" class="btn btn-warning"
+                                                    style="margin-right: 5px"><i class="fa-solid fa-pen-to-square"></i></a>
                                                 <form action="/sale/delete/{{ $sale->id }}" method="POST">
                                                     @method('DELETE')
                                                     @csrf
-                                                    <button type="submit" class="btn btn-danger" style="margin-right: 5px"><i class="fa-solid fa-trash"></i></button>
+                                                    <button type="submit" class="btn btn-danger"
+                                                        style="margin-right: 5px"><i class="fa-solid fa-trash"></i></button>
                                                 </form>
-                                                <button class="btn btn-primary" data-toggle="modal" data-target="#myModal{{ $sale->id }}">
+                                                <button class="btn btn-primary" data-bs-toggle="modal"
+                                                    data-bs-target="#editModal" data-total_price="{{ $sale->total_price }}">
                                                     <i class="fa-solid fa-eye"></i>
                                                 </button>
 
-                                                @php $filteredDetails = $dataSale->filter(function ($item) use ($sale) {
-                                                    return $item->sale_id == $sale->id;
-                                                }); @endphp 
-
-                                                <div class="modal fade" id="myModal{{ $sale->id }}">
+                                                {{-- <div class="modal fade" id="myModal{{ $sale->id }}">
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
 
@@ -55,7 +64,7 @@
                                                                     data-dismiss="modal">&times;</button>
                                                             </div>
 
-                                                            {{-- <div class="modal-body">
+                                                            <div class="modal-body">
                                                                 <p><strong>Total Produk:</strong>
                                                                     {{ $filteredDetails->total_produk }}</p>
                                                                 <p><strong>Subtotal:</strong> {{ $filteredDetails->subtotal }}</p>
@@ -63,15 +72,15 @@
                                                                     {{ $filteredDetails->name }}</p>
                                                                 <p><strong>Sale Date:</strong> {{ $filteredDetails->created_at }}
                                                                 </p>
-                                                            </div> --}}
-                                                            
+                                                            </div>
+
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-danger"
                                                                     data-dismiss="modal">Close</button>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </div> --}}
                                             </td>
                                         </tr>
                                     @endforeach
@@ -83,4 +92,47 @@
             </div>
         </div>
     </div>
+    <!-- Modal Edit -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content" id="modal-content">
+
+                {{-- content here --}}
+
+            </div>
+        </div>
+    </div>
+    <!-- End Modal Edit -->
+@endsection
+
+@section('js')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"
+        integrity="sha512-rstIgDs0xPgmG6RX1Aba4KV5cWJbAMcvRCVmglpam9SoHZiUCyQVDdH2LPlxoHtrv17XWblE/V/PP+Tr04hbtA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+
+    <script>
+        $('#editModal').on('shown.bs.modal', function(e) {
+            var html = `
+            <div class="modal-content" id="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Detail Sale</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="edit">
+
+                        <div class="mb-3">
+                            <label for="Username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" aria-describedby="Username"
+                                placeholder="..." name="username" value="${$(e.relatedTarget).data('total_price')}">
+                        </div>
+
+                    </div>
+                </div>
+                `;
+
+            $('#modal-content').html(html);
+
+        });
+    </script>
 @endsection
